@@ -1,13 +1,13 @@
 tumblr.sh
 =========
 
-v0.1
+Versão 0.1
 
 Este script baixa as imagens dos blogs do Tumblr.com.
 
 A cada 30 páginas verificadas o script cria uma nova pasta para organizar as imagens.
 
-Formato das imagens
+Formato das imagens.
 ```bash
 jpg,jpeg,gif,png
 ```
@@ -20,12 +20,12 @@ Conceda permissão de execução no arquivo.
 sudo chmod +x tumblr.sh
 ```
 
-Acessar o ajuda do script
+Acessar o ajuda do script.
 ```bash
 ./tumblr.sh --help
 ```
 
-Executando o tumblr.sh
+Executando o script tumblr.sh e inserindo os parâmetros.
 ```bash
 ./tumblr.sh %1 %2 %3 %4 %5
              |  |  |  |  |
