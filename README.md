@@ -2,7 +2,9 @@ tumblr.sh
 =========
 
 v0.1
+
 Este script baixa as imagens dos blogs do Tumblr.com.
+
 A cada 30 páginas verificadas o script cria uma nova pasta para organizar as imagens.
 
 Formato das imagens
