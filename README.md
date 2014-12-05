@@ -1,7 +1,7 @@
 tumblr.sh
 =========
 
-Versão 0.1
+Versão 0.2
 
 Este script baixa as imagens dos blogs do Tumblr.com.
 
@@ -9,7 +9,11 @@ A cada 30 páginas verificadas o script cria uma nova pasta para organizar as im
 
 Formato das imagens.
 ```bash
-jpg,jpeg,gif,png
+jpg,jpeg,png
+```
+Resoluções das imagens.
+```bash
+500px ou 1280px
 ```
 
 Modo de Uso
@@ -27,11 +31,11 @@ Acessar o ajuda do script.
 
 Executando o script tumblr.sh e inserindo os parâmetros.
 ```bash
-./tumblr.sh %1 %2 %3 %4 %5
-             |  |  |  |  |
-             |  |  |  |  Pasta de destino (. pasta local)
-             |  |  |  Formato da imagem separado por vírgula (jpg,jpeg,gif,png)
-             |  |  true / false - [true] Cria uma pasta a cada 30 páginas verificadas
-             |  Quantidade de páginas (ex: 10) ou entre as páginas (ex: 5-10)
-             URL do tumblr com http
+./tumblr.sh %1 %2 %3 %4 %5"
+             |  |  |  |  |"
+             |  |  |  |  Pasta de destino (. pasta local)"
+             |  |  |  true / false - [true] Imagens em 1280px - [false] Imagens em 500px"
+             |  |  true / false - [true] Cria uma pasta a cada 30 páginas verificadas"
+             |  Quantidade de páginas (ex: 10) ou entre as páginas (ex: 5-10)"
+             URL do tumblr sem http (dominio.com ou site.tumblr.com)"
 ```
