@@ -2,19 +2,19 @@
 
 # Eduardo A. Resende
 # Data de desenvolvimento 09/08/2014
-# Data de Modificação 11/08/2014
+# Data de Modificação 05/12/2014
 
 PAGINA=$1
 NUMEROPAGINA=$2
 CRIARPASTA=$3
-FORMATO=$4
+IMGHD=$4
 PASTADESTINO=$5
 
 function INFOHELP()
 {
 	echo " "
 	echo " "
-	echo "#  IMG Tumblr v0.1"
+	echo "#  IMG Tumblr v0.2"
 	echo "#  por Eduardo Resende"
 	echo " "
 	echo "#  Permissão de execução no arquivo"
@@ -23,10 +23,10 @@ function INFOHELP()
 	echo "#  ./tumblr.sh %1 %2 %3 %4 %5"
 	echo "#               |  |  |  |  |"
 	echo "#               |  |  |  |  Pasta de destino (. pasta local)"
-	echo "#               |  |  |  Formato da imagem separado por vírgula (jpg,jpeg,gif,png)"
+	echo "#               |  |  |  true / false - [true] Imagens em 1280px - [false] Imagens em 500px"
 	echo "#               |  |  true / false - [true] Cria uma pasta a cada 30 páginas verificadas"
 	echo "#               |  Quantidade de páginas (ex: 10) ou entre as páginas (ex: 5-10)"
-	echo "#               URL do tumblr com http"
+	echo "#               URL do tumblr sem http (dominio.com ou site.tumblr.com)"
 	echo " "
 	echo " "
 
@@ -39,96 +39,115 @@ if [ "$PAGINA" == "help" ] || [ "$PAGINA" == "--help" ] ; then
 
 else
 
-	VERIFICAURL=$(echo $PAGINA | grep "http")
+	NPAGINA=$(echo $NUMEROPAGINA | grep "-")
 
-	if [ -z "$VERIFICAURL" ] ; then
+	if [ -z "$NPAGINA" ] ; then
 
-		INFOHELP
+		INICIO=1
+		MAXIMO=$NUMEROPAGINA
 
 	else
 
-		NPAGINA=$(echo $NUMEROPAGINA | grep "-")
+		PINICIO=$(echo $NUMEROPAGINA | cut -d "-" -f1)
+		PMAXIMO=$(echo $NUMEROPAGINA | cut -d "-" -f2)
 
-		if [ -z "$NPAGINA" ] ; then
+		INICIO=$PINICIO
+		MAXIMO=$PMAXIMO
 
-			INICIO=1
-			MAXIMO=$NUMEROPAGINA
+	fi
 
-		else
+	if [ -z "$PASTADESTINO" ] ; then
 
-			PINICIO=$(echo $NUMEROPAGINA | cut -d "-" -f1)
-			PMAXIMO=$(echo $NUMEROPAGINA | cut -d "-" -f2)
+		PASTADESTINO=.
 
-			INICIO=$PINICIO
-			MAXIMO=$PMAXIMO
+	fi
 
-		fi
+	if [ -d "$PASTADESTINO" ] ; then
 
-		if [ -z "$PASTADESTINO" ] ; then
+		PASTADESTINO=$PASTADESTINO
 
-			PASTADESTINO=.
+	else
 
-		fi
-		
-		if [ -d "$PASTADESTINO" ] ; then
+		mkdir $PASTADESTINO
+		PASTADESTINO=$PASTADESTINO
 
-			PASTADESTINO=$PASTADESTINO
+	fi
 
-		else
+	for ((i=$INICIO; i<=MAXIMO; ++i )) ;
+	do
 
-			mkdir $PASTADESTINO
-			PASTADESTINO=$PASTADESTINO
-		
-		fi
+		if [ "$CRIARPASTA" == "true" ] || [ "$CRIARPASTA" == "TRUE" ] ; then
 
-		for ((i=$INICIO; i<=MAXIMO; ++i )) ;
-		do
+			if [ "$i" == "1" ] ; then
 
-			if [ "$CRIARPASTA" == "true" ] || [ "$CRIARPASTA" == "TRUE" ] ; then
-
-				if [ "$i" == "1" ] ; then
-
-					mkdir $PASTADESTINO/imagens-0$INICIO
-					GUARDANUMERO=$i
-					PASTA=$PASTADESTINO/imagens-0$INICIO
-
-				fi
-
-				ATUAL=$(($i%30))
-
-				if [ "$ATUAL" == "0" ] ; then
-
-					GUARDANUMERO=$(($GUARDANUMERO+1))
-					GUARDANUMEROATUAL=$GUARDANUMERO
-
-					if [ "$GUARDANUMERO" -lt "10" ] ; then
-
-						GUARDANUMERO=0$GUARDANUMERO
-
-					fi
-
-					mkdir $PASTADESTINO/imagens-$GUARDANUMERO
-					PASTA=$PASTADESTINO/imagens-$GUARDANUMERO
-					GUARDANUMERO=$GUARDANUMEROATUAL
-
-				fi
-
-			elif [ "$CRIARPASTA" == "false" ] || [ "$CRIARPASTA" == "FALSE" ] ; then
-
-				PASTA=$PASTADESTINO
-
-			else
-
-				INFOHELP
+				mkdir $PASTADESTINO/imagens-0$INICIO
+				GUARDANUMERO=$i
+				PASTA=$PASTADESTINO/imagens-0$INICIO
 
 			fi
 
-			URLTRATADA=${PAGINA%/}
+			ATUAL=$(($i%30))
 
-			wget -nd -H -p -A $FORMATO -e robots=off $URLTRATADA/page/$i -P $PASTA
+			if [ "$ATUAL" == "0" ] ; then
+
+				GUARDANUMERO=$(($GUARDANUMERO+1))
+				GUARDANUMEROATUAL=$GUARDANUMERO
+
+				if [ "$GUARDANUMERO" -lt "10" ] ; then
+
+					GUARDANUMERO=0$GUARDANUMERO
+
+				fi
+
+				mkdir $PASTADESTINO/imagens-$GUARDANUMERO
+				PASTA=$PASTADESTINO/imagens-$GUARDANUMERO
+				GUARDANUMERO=$GUARDANUMEROATUAL
+
+			fi
+
+		elif [ "$CRIARPASTA" == "false" ] || [ "$CRIARPASTA" == "FALSE" ] ; then
+
+			PASTA=$PASTADESTINO
+
+		else
+
+			INFOHELP
+
+		fi
+
+		URLTRATADA=${PAGINA%/}
+		PAGINASCP=$(echo $PAGINA | sed 's%\.%\\.%g')
+		PAGINAHTTP="http://$PAGINA"
+		LISTAIMG=`wget -qO- $PAGINAHTTP/page/$i | sed -rn -e "/$PAGINASCP\/post/ s/.*(\"http:\/\/\$PAGINASCP\/post.*\").*/\1/p" | sed -rn -e 's/"([^"|^#]*)(["#].*)/\1/p' | sort | uniq`
+
+		for POST in $LISTAIMG; do
+
+			if [ "$IMGHD" == "true" ] ; then
+
+				IMGURLLISTA=`wget -qO- $POST | sed -rn -e '/="http:\/\/.*media\.tumblr\.com\/.*\/tumblr_([^<]+)._1280.(jpg|jpeg|png)"/ s/.*("http:\/\/.*media\.tumblr\.com\/.*\/tumblr_([^<]+)._1280.(jpg|jpeg|png)").*/\1/p' | sed -rn -e 's/"([^"|^#]*)(["#].*)/\1/p' | sort | uniq`
+				RESOLUCAO="1280px"
+
+			else
+
+				IMGURLLISTA=`wget -qO- $POST | sed -rn -e '/="http:\/\/.*media\.tumblr\.com\/.*\/tumblr_([^<]+)._500.(jpg|jpeg|png)"/ s/.*("http:\/\/.*media\.tumblr\.com\/.*\/tumblr_([^<]+)._500.(jpg|jpeg|png)").*/\1/p' | sed -rn -e 's/"([^"|^#]*)(["#].*)/\1/p' | sort | uniq`
+				RESOLUCAO="500px"
+
+			fi
+
+
+			if [ -z "$IMGURLLISTA" ] ; then
+
+				echo -e "Imagem não encontrada ou menor que $RESOLUCAO. \n"
+
+			else
+
+				echo -e "$IMGURLLISTA \n"
+				wget -q $IMGURLLISTA -P $PASTA
+
+			fi
 
 		done
 
-	fi
+	done
 
 fi
