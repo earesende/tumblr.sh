@@ -31,11 +31,11 @@ Acessar o ajuda do script.
 
 Executando o script tumblr.sh e inserindo os parâmetros.
 ```bash
-./tumblr.sh %1 %2 %3 %4 %5"
-             |  |  |  |  |"
-             |  |  |  |  Pasta de destino (. pasta local)"
-             |  |  |  true / false - [true] Imagens em 1280px - [false] Imagens em 500px"
-             |  |  true / false - [true] Cria uma pasta a cada 30 páginas verificadas"
-             |  Quantidade de páginas (ex: 10) ou entre as páginas (ex: 5-10)"
-             URL do tumblr sem http (dominio.com ou site.tumblr.com)"
+./tumblr.sh %1 %2 %3 %4 %5
+             |  |  |  |  |
+             |  |  |  |  Pasta de destino (. pasta local)
+             |  |  |  true / false - [true] Imagens em 1280px - [false] Imagens em 500px
+             |  |  true / false - [true] Cria uma pasta a cada 30 páginas verificadas
+             |  Quantidade de páginas (ex: 10) ou entre as páginas (ex: 5-10)
+             URL do tumblr sem http (dominio.com ou site.tumblr.com)
 ```
