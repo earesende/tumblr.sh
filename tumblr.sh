@@ -2,7 +2,7 @@
 
 # Eduardo A. Resende
 # Data de desenvolvimento 09/08/2014
-# Data de Modificação 05/12/2014
+# Data de Modificação 10/12/2014
 
 PAGINA=$1
 NUMEROPAGINA=$2
@@ -14,7 +14,7 @@ function INFOHELP()
 {
 	echo " "
 	echo " "
-	echo "#  IMG Tumblr v0.2"
+	echo "#  IMG Tumblr v0.2.1"
 	echo "#  por Eduardo Resende"
 	echo " "
 	echo "#  Permissão de execução no arquivo"
@@ -142,7 +142,7 @@ else
 			else
 
 				echo -e "$IMGURLLISTA \n"
-				wget -q $IMGURLLISTA -P $PASTA
+				wget -nc -q $IMGURLLISTA -P $PASTA
 
 			fi
 
