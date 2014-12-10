@@ -1,7 +1,7 @@
 tumblr.sh
 =========
 
-Versão 0.2
+Versão 0.2.1
 
 Este script baixa as imagens dos blogs do Tumblr.com.
 
