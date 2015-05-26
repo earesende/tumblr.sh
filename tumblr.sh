@@ -6,7 +6,7 @@
 
 PAGINA=$1
 NUMEROPAGINA=$2
-CRIARPASTA=$3
+QTEARQUIVOS=$3
 IMGHD=$4
 PASTADESTINO=$5
 
@@ -14,19 +14,19 @@ function INFOHELP()
 {
 	echo " "
 	echo " "
-	echo "#  IMG Tumblr v0.2.1"
+	echo "#  IMG Tumblr v0.3"
 	echo "#  por Eduardo Resende"
 	echo " "
 	echo "#  Permissão de execução no arquivo"
-	echo "#  chmod +x tumblr.sh"
+	echo "#  chmod +x tumblr-v0.3.sh"
 	echo " "
-	echo "#  ./tumblr.sh %1 %2 %3 %4 %5"
-	echo "#               |  |  |  |  |"
-	echo "#               |  |  |  |  Pasta de destino (. pasta local)"
-	echo "#               |  |  |  true / false - [true] Imagens em 1280px - [false] Imagens em 500px"
-	echo "#               |  |  true / false - [true] Cria uma pasta a cada 30 páginas verificadas"
-	echo "#               |  Quantidade de páginas (ex: 10) ou entre as páginas (ex: 5-10)"
-	echo "#               URL do tumblr sem http (dominio.com ou site.tumblr.com)"
+	echo "#  ./tumblr-v0.3.sh %1 %2 %3 %4 %5"
+	echo "#                    |  |  |  |  |"
+	echo "#                    |  |  |  |  Pasta de destino (. pasta local)"
+	echo "#                    |  |  |  true / false - [true] Imagens em 1280px - [false] Imagens em 500px"
+	echo "#                    |  |  Quantidade de arquivos por pasta - [0] para não criar pasta"
+	echo "#                    |  Quantidade de páginas (ex: 15) ou entre as páginas (ex: 5-20)"
+	echo "#                    URL do tumblr sem http (dominio.com ou site.tumblr.com)"
 	echo " "
 	echo " "
 
@@ -56,62 +56,49 @@ else
 
 	fi
 
-	if [ -z "$PASTADESTINO" ] ; then
+	if [ "$(echo $QTEARQUIVOS | grep "^[ [:digit:] ]*$")" ] ; then
 
-		PASTADESTINO=.
+		if [ -z "$PASTADESTINO" ] ; then
 
-	fi
+			PASTADESTINO=.
 
-	if [ -d "$PASTADESTINO" ] ; then
+		fi
 
-		PASTADESTINO=$PASTADESTINO
+		if [ -d "$PASTADESTINO" ] ; then
+
+			PASTADESTINO=$PASTADESTINO
+
+		else
+
+			mkdir $PASTADESTINO
+			PASTADESTINO=$PASTADESTINO
+
+		fi
 
 	else
 
-		mkdir $PASTADESTINO
-		PASTADESTINO=$PASTADESTINO
+		INFOHELP
 
 	fi
 
 	for ((i=$INICIO; i<=MAXIMO; ++i )) ;
 	do
 
-		if [ "$CRIARPASTA" == "true" ] || [ "$CRIARPASTA" == "TRUE" ] ; then
-
-			if [ "$i" == "1" ] ; then
-
-				mkdir $PASTADESTINO/imagens-0$INICIO
-				GUARDANUMERO=$i
-				PASTA=$PASTADESTINO/imagens-0$INICIO
-
-			fi
-
-			ATUAL=$(($i%30))
-
-			if [ "$ATUAL" == "0" ] ; then
-
-				GUARDANUMERO=$(($GUARDANUMERO+1))
-				GUARDANUMEROATUAL=$GUARDANUMERO
-
-				if [ "$GUARDANUMERO" -lt "10" ] ; then
-
-					GUARDANUMERO=0$GUARDANUMERO
-
-				fi
-
-				mkdir $PASTADESTINO/imagens-$GUARDANUMERO
-				PASTA=$PASTADESTINO/imagens-$GUARDANUMERO
-				GUARDANUMERO=$GUARDANUMEROATUAL
-
-			fi
-
-		elif [ "$CRIARPASTA" == "false" ] || [ "$CRIARPASTA" == "FALSE" ] ; then
+		if [ "$QTEARQUIVOS" == "0" ] ; then
 
 			PASTA=$PASTADESTINO
 
 		else
 
-			INFOHELP
+			if [ "$i" == "1" ] ; then
+
+				VALORPASTAINT=$[100 + $[RANDOM % 899]]
+				VALORPASTASTR=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 3 | head -n 1)
+				mkdir $PASTADESTINO/imagens-$VALORPASTASTR$VALORPASTAINT
+				PASTA=$PASTADESTINO/imagens-$VALORPASTASTR$VALORPASTAINT
+				echo -e  "$PASTA \n"
+
+			fi
 
 		fi
 
@@ -121,6 +108,27 @@ else
 		LISTAIMG=`wget -qO- $PAGINAHTTP/page/$i | sed -rn -e "/$PAGINASCP\/post/ s/.*(\"http:\/\/\$PAGINASCP\/post.*\").*/\1/p" | sed -rn -e 's/"([^"|^#]*)(["#].*)/\1/p' | sort | uniq`
 
 		for POST in $LISTAIMG; do
+
+			if [ "$QTEARQUIVOS" == "0" ] ; then
+
+				PASTA=$PASTADESTINO
+
+			else
+
+				QTE=$(ls -l $PASTA | grep -v ^l | wc -l)
+				QTEARQ=$(($QTEARQUIVOS + 1))
+
+				if [ "$QTE" -ge "$QTEARQ" ] ; then
+
+					VALORPASTAINT=$[100 + $[RANDOM % 899]]
+					VALORPASTASTR=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 3 | head -n 1)
+					mkdir $PASTADESTINO/imagens-$VALORPASTASTR$VALORPASTAINT
+					PASTA=$PASTADESTINO/imagens-$VALORPASTASTR$VALORPASTAINT
+					echo -e  "$PASTA \n"
+
+				fi
+
+			fi
 
 			if [ "$IMGHD" == "true" ] ; then
 
@@ -133,7 +141,6 @@ else
 				RESOLUCAO="500px"
 
 			fi
-
 
 			if [ -z "$IMGURLLISTA" ] ; then
 
